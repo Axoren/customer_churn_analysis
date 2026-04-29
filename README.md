@@ -2,7 +2,7 @@
 
 This project analyzes customer churn patterns using the Telco Customer Churn dataset.
 
-The goal is to identify churn drivers and convert them into practical retention recommendations.
+The goal is to identify churn drivers, build a baseline churn model, and convert results into practical retention recommendations.
 
 ## Business Problem
 
@@ -13,7 +13,8 @@ The key questions:
 1. What share of customers churn?
 2. Which customer characteristics are linked to higher churn?
 3. Which contract and payment patterns increase churn risk?
-4. Which customer groups should retention teams prioritize?
+4. Can a baseline model help prioritize customers by churn risk?
+5. Which customer groups should retention teams prioritize?
 
 ## Dataset
 
@@ -32,6 +33,28 @@ Main fields used:
 | PaymentMethod | Payment method |
 | Churn | Churn flag |
 
+## Project Files
+
+| Path | Purpose |
+|---|---|
+| `src/churn_analysis.py` | Clean reproducible Python script for churn metrics and baseline model |
+| `requirements.txt` | Python dependencies |
+| `screenshots/` | Exported visualizations |
+
+## How to Run
+
+Install dependencies:
+
+```bash
+pip install -r requirements.txt
+```
+
+Run the analysis script:
+
+```bash
+python src/churn_analysis.py
+```
+
 ## Methodology
 
 The analysis follows this workflow:
@@ -39,9 +62,10 @@ The analysis follows this workflow:
 1. Load customer-level data.
 2. Clean missing and incorrectly typed fields.
 3. Calculate overall churn rate.
-4. Compare churn by contract type, tenure, service usage, and monthly charges.
-5. Visualize churn patterns.
-6. Translate analytical findings into retention actions.
+4. Compare churn by contract type and payment method.
+5. Build a baseline logistic regression model.
+6. Evaluate the model with ROC-AUC, confusion matrix, and classification report.
+7. Translate analytical findings into retention actions.
 
 ## Metrics
 
@@ -60,7 +84,13 @@ segment_churn_rate = churned_customers_in_segment / total_customers_in_segment
 Revenue exposure:
 
 ```text
-monthly_revenue_exposure = churned_customers * average_monthly_charges
+monthly_revenue_exposure = sum(monthly_charges for churned customers)
+```
+
+Model quality:
+
+```text
+roc_auc = ability to rank churned customers above non-churned customers
 ```
 
 ## Visualizations
@@ -83,6 +113,7 @@ monthly_revenue_exposure = churned_customers * average_monthly_charges
 2. Customers with higher monthly charges show stronger churn tendency.
 3. Contract type is one of the clearest churn-related variables.
 4. Tenure should be treated as a key retention dimension.
+5. A baseline model gives a structured starting point for churn risk prioritization.
 
 ## Business Recommendations
 
@@ -98,12 +129,25 @@ monthly_revenue_exposure = churned_customers * average_monthly_charges
 4. Build churn monitoring by tenure groups.
    Newer customers and short-tenure customers should be tracked separately.
 
-5. Add churn prediction as the next project stage.
-   EDA identifies patterns, but a scoring model would help prioritize individual customers.
+5. Use churn scores for prioritization, not for automatic decisions.
+   The model should support retention teams, not replace business review.
+
+## Code Quality Improvements
+
+The project now includes a reproducible script version of the analysis.
+
+The script:
+
+- separates loading, cleaning, metric calculation, modeling, and reporting into functions,
+- converts `TotalCharges` safely to numeric,
+- calculates churn summaries by segment,
+- trains a baseline logistic regression model,
+- evaluates model quality with ROC-AUC and classification metrics,
+- uses clear naming and typed function signatures.
 
 ## Limitations
 
-- The current version is exploratory and does not include a predictive model.
+- The model is a baseline, not a production scoring system.
 - The analysis does not include acquisition source or marketing campaign history.
 - Churn causes are inferred from patterns, not proven causally.
 - Revenue impact is estimated only at a high level.
@@ -113,18 +157,19 @@ monthly_revenue_exposure = churned_customers * average_monthly_charges
 
 Planned improvements:
 
-- add logistic regression or tree-based churn model,
-- calculate ROC-AUC, precision, recall, and confusion matrix,
 - add feature importance,
 - create churn risk tiers,
 - estimate retention campaign ROI,
-- add SQL version of the analysis.
+- compare logistic regression with tree-based models,
+- add SQL version of the analysis,
+- build a Tableau dashboard for churn monitoring.
 
 ## Tools
 
 - Python
 - Pandas
 - NumPy
+- Scikit-learn
 - Matplotlib
 - Seaborn
 - Jupyter Notebook
